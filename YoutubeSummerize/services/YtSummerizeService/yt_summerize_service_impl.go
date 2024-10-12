@@ -2,11 +2,12 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"regexp"
 
 	"github.com/ryhnfhrza/YoutubeSummerize/exception"
 	"github.com/ryhnfhrza/YoutubeSummerize/helper"
-	"github.com/ryhnfhrza/YoutubeSummerize/model/web"
+	//"github.com/ryhnfhrza/YoutubeSummerize/model/web"
 )
 
 type YtSummerizaServiceImpl struct {
@@ -20,7 +21,7 @@ func NewYtSummerizaService() YtSummerizeService {
 
 
 
-func(service *YtSummerizaServiceImpl)Summerize(ctx context.Context,ytLink string)web.SummerizeResponses{
+func(service *YtSummerizaServiceImpl)Summerize(ctx context.Context,ytLink string)string{
 	var youtubeRegex = regexp.MustCompile(`^(https?\:\/\/)?(www\.youtube\.com|youtu\.?be)\/.+$`)
 	
 	if !youtubeRegex.MatchString(ytLink) {
@@ -31,17 +32,21 @@ func(service *YtSummerizaServiceImpl)Summerize(ctx context.Context,ytLink string
 	
 	 videoID, err := helper.ExtractVideoID(ytLink)
 	 if err != nil {
-			 helper.PanicIfError(err)
+			fmt.Println("Attempting to fetch subtitles for video ID:", videoID)
+			fmt.Println("Error extracting video ID:", err)
+			helper.PanicIfError(err)
 	 }
 
 	 
 	 subtitleFile, err := helper.GetSubtitle(videoID)
 	 if err != nil {
-			 helper.PanicIfError(err)
+			fmt.Println("Error getting subtitle:", err)
+			helper.PanicIfError(err)
 	 }
 
 	 
 
-	 return response
+	 return subtitleFile
 }
+
 
