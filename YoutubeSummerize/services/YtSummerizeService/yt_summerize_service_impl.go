@@ -11,42 +11,31 @@ import (
 )
 
 type YtSummerizaServiceImpl struct {
-	
 }
 
 func NewYtSummerizaService() YtSummerizeService {
-	return &YtSummerizaServiceImpl{
-	}
+	return &YtSummerizaServiceImpl{}
 }
 
-
-
-func(service *YtSummerizaServiceImpl)Summerize(ctx context.Context,ytLink string)string{
+func (service *YtSummerizaServiceImpl) Summerize(ctx context.Context, ytLink string) (string,error) {
 	var youtubeRegex = regexp.MustCompile(`^(https?\:\/\/)?(www\.youtube\.com|youtu\.?be)\/.+$`)
-	
+
 	if !youtubeRegex.MatchString(ytLink) {
-		panic(exception.NewBadRequestError("Invalid YouTube link format"))
+		return "", exception.NewBadRequestError("Invalid YouTube link format")
 	}
 
+	videoID, err := helper.ExtractVideoID(ytLink)
+	if err != nil {
+		fmt.Println("Attempting to fetch subtitles for video ID:", videoID)
+		fmt.Println("Error extracting video ID:", err)
+		return "", fmt.Errorf("error extracting video ID: %v", err)
+	}
 
-	
-	 videoID, err := helper.ExtractVideoID(ytLink)
-	 if err != nil {
-			fmt.Println("Attempting to fetch subtitles for video ID:", videoID)
-			fmt.Println("Error extracting video ID:", err)
-			helper.PanicIfError(err)
-	 }
+	subtitleFile, err := helper.GetSubtitle(videoID)
+	if err != nil {
+		fmt.Println("Error getting subtitle:", err)
+		return "", fmt.Errorf("error getting subtitle: %v", err)
+	}
 
-	 
-	 subtitleFile, err := helper.GetSubtitle(videoID)
-	 if err != nil {
-			fmt.Println("Error getting subtitle:", err)
-			helper.PanicIfError(err)
-	 }
-
-	 
-
-	 return subtitleFile
+	return subtitleFile,nil
 }
-
-

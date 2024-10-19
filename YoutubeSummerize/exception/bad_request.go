@@ -1,9 +1,13 @@
 package exception
 
 type BadRequestError struct {
-	Error string
+	Message string
 }
 
-func NewBadRequestError(error string) BadRequestError {
-	return BadRequestError{Error: error}
+func (e BadRequestError) Error() string {
+	return e.Message
+}
+
+func NewBadRequestError(message string) BadRequestError {
+	return BadRequestError{Message: message}
 }

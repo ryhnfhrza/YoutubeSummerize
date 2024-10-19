@@ -5,5 +5,5 @@ import (
 )
 
 type YtSummerizeService interface {
-	Summerize(ctx context.Context, ytLink string) string
+	Summerize(ctx context.Context, ytLink string) (string,error)
 }

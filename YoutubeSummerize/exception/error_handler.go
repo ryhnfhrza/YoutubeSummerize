@@ -3,7 +3,7 @@ package exception
 import (
 	"net/http"
 
-	"github.com/ryhnfhrza/YoutubeSummerize/helper"
+	"github.com/ryhnfhrza/YoutubeSummerize/httpResponse"
 	"github.com/ryhnfhrza/YoutubeSummerize/model/web"
 )
 
@@ -18,64 +18,64 @@ func ErrorHandler(next http.Handler) http.Handler {
 	})
 }
 
-func handleError(writer http.ResponseWriter , request *http.Request, err interface{}){
-	if notFoundError(writer,request,err){
+func handleError(writer http.ResponseWriter, request *http.Request, err interface{}) {
+	if notFoundError(writer, request, err) {
 		return
 	}
 
-	if badRequestError(writer,request,err){
+	if badRequestError(writer, request, err) {
 		return
 	}
 
-
-	internalServerError(writer,request,err)
+	internalServerError(writer, request, err)
 
 }
 
-func notFoundError(writer http.ResponseWriter , request *http.Request, err interface{}) bool {
-	exception,ok := err.(NotFoundError)
-	if ok{
-		writer.Header().Set("Content-Type","application/json")
+func notFoundError(writer http.ResponseWriter, request *http.Request, err interface{}) bool {
+	exception, ok := err.(NotFoundError)
+	if ok {
+		writer.Header().Set("Content-Type", "application/json")
 		writer.WriteHeader(http.StatusNotFound)
 
 		webResponse := web.WebResponse{
-			Code: http.StatusNotFound,
+			Code:   http.StatusNotFound,
 			Status: "NOT FOUND",
-			Data: exception.Error,
+			Data:   exception.Error,
 		}
-		helper.WriteToResponseBody(writer,webResponse)
+		httpResponse.WriteToResponseBody(writer, webResponse)
 		return true
-	}else{
+	} else {
 		return false
 	}
 }
 
-func internalServerError(writer http.ResponseWriter , request *http.Request, err interface{}){
-	writer.Header().Set("Content-Type","application/json")
+func internalServerError(writer http.ResponseWriter, request *http.Request, err interface{}) {
+	exception, _ := err.(InternalServerError)
+	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(http.StatusInternalServerError)
 	webResponse := web.WebResponse{
-		Code: http.StatusInternalServerError,
+		Code:   http.StatusInternalServerError,
 		Status: "INTERNAL SERVER ERROR",
-		Data: err,
+		Data:   exception.Error,
 	}
 
-	helper.WriteToResponseBody(writer,webResponse)
+	httpResponse.WriteToResponseBody(writer, webResponse)
 }
 
-func badRequestError(writer http.ResponseWriter , request *http.Request, err interface{}) bool {
-	exception,ok := err.(BadRequestError)
-	if ok{
-		writer.Header().Set("Content-Type","application/json")
+func badRequestError(writer http.ResponseWriter, request *http.Request, err interface{}) bool {
+	exception, ok := err.(BadRequestError)
+	if ok {
+		writer.Header().Set("Content-Type", "application/json")
 		writer.WriteHeader(http.StatusBadRequest)
 
 		webResponse := web.WebResponse{
-			Code: http.StatusBadRequest,
+			Code:   http.StatusBadRequest,
 			Status: "BAD REQUEST",
-			Data: exception.Error,
+			Data:   exception.Error,
 		}
-		helper.WriteToResponseBody(writer,webResponse)
+		httpResponse.WriteToResponseBody(writer, webResponse)
 		return true
-	}else{
+	} else {
 		return false
 	}
 }
